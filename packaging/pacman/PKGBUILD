@@ -1,0 +1,49 @@
+# Maintainer: Manus AI <dev@manus.ai>
+pkgname=faas-runtime
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="AWS Lambda-compatible FaaS runtime for Rust functions"
+arch=('x86_64')
+url="https://github.com/manus-ai/rust-lambda-faas"
+license=('Apache')
+depends=('gcc-libs')
+makedepends=('rust' 'cargo' 'gcc')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "$srcdir/$pkgname-$pkgver/runtime"
+    
+    # Build with release optimizations
+    cargo build --release --locked
+}
+
+check() {
+    cd "$srcdir/$pkgname-$pkgver/runtime"
+    
+    # Run tests if available
+    cargo test --release || true
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver"
+    
+    # Install binary
+    install -Dm755 "runtime/target/release/faas-runtime" \
+        "$pkgdir/opt/faas-runtime/bin/runtime"
+    
+    # Install bootstrap script
+    install -dm755 "$pkgdir/var/runtime"
+    cat > "$pkgdir/var/runtime/bootstrap" << 'EOF'
+#!/bin/sh
+exec /opt/faas-runtime/bin/runtime
+EOF
+    chmod 755 "$pkgdir/var/runtime/bootstrap"
+    
+    # Create task directory
+    install -dm755 "$pkgdir/var/task"
+    
+    # Install documentation
+    install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

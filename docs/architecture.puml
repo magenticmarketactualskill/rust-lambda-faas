@@ -1,0 +1,92 @@
+@startuml AWS Lambda FaaS Runtime Architecture
+
+!define RECTANGLE class
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FFFFFF
+skinparam component {
+    BackgroundColor<<runtime>> #E1F5FE
+    BackgroundColor<<function>> #FFF3E0
+    BackgroundColor<<aws>> #F3E5F5
+    BackgroundColor<<container>> #E8F5E9
+}
+
+title AWS Lambda-Compatible FaaS Runtime Architecture
+
+package "AWS Lambda Environment" <<aws>> {
+    [Lambda Runtime API] as API
+    note right of API
+        HTTP API Endpoints:
+        - GET /runtime/invocation/next
+        - POST /runtime/invocation/{id}/response
+        - POST /runtime/invocation/{id}/error
+        - POST /runtime/init/error
+    end note
+}
+
+package "FaaS Container" <<container>> {
+    package "Runtime Layer" <<runtime>> {
+        [Bootstrap Script] as Bootstrap
+        [FaaS Runtime\n(Rust Binary)] as Runtime
+        
+        component "Runtime Components" {
+            [HTTP Client\n(Hyper)] as HTTPClient
+            [Event Loop\n(Tokio)] as EventLoop
+            [Function Loader\n(libloading)] as Loader
+        }
+    }
+    
+    package "Function Layer" <<function>> {
+        [User Function\n(.so library)] as Function
+    }
+}
+
+package "Base Images" <<container>> {
+    [RedHat UBI Minimal] as UBI
+    [Alpine Linux] as Alpine
+}
+
+' Relationships
+Bootstrap --> Runtime : exec
+Runtime --> HTTPClient : uses
+Runtime --> EventLoop : uses
+Runtime --> Loader : uses
+Loader --> Function : dlopen
+Runtime --> API : HTTP requests
+Function --> Runtime : returns result
+
+UBI ..> Runtime : contains
+Alpine ..> Runtime : contains
+
+' Notes
+note bottom of Function
+    User-provided Rust function
+    compiled as cdylib (.so)
+    
+    Exports:
+    - handle(payload, context) -> Result
+end note
+
+note bottom of Runtime
+    Implements AWS Lambda Runtime API
+    
+    Features:
+    - Dynamic function loading
+    - Async event processing
+    - Error handling
+    - Tracing/logging
+end note
+
+note bottom of UBI
+    Production-ready
+    Enterprise compliance
+    Size: ~150 MB
+end note
+
+note bottom of Alpine
+    Ultra-minimal
+    Static linking
+    Size: ~15 MB
+end note
+
+@enduml
