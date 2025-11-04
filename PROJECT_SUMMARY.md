@@ -317,9 +317,16 @@ docker run \
 
 ```
 rust-lambda-faas/
-├── runtime/                    # FaaS runtime source code
-│   ├── src/
-│   │   └── main.rs            # Runtime implementation
+├── submodules/
+│   ├── runtime/                # FaaS runtime source code
+│   │   ├── src/
+│   │   │   └── main.rs        # Runtime implementation
+│   │   └── Cargo.toml         # Rust dependencies
+│   └── runtime_api_gem/        # Ruby gem for Runtime API server
+│       ├── lib/
+│       │   └── runtime_api/   # Gem implementation
+│       ├── spec/              # Tests
+│       └── examples/          # Usage examples
 │   ├── Cargo.toml             # Runtime dependencies
 │   └── Cargo.lock
 ├── examples/                   # Example user functions

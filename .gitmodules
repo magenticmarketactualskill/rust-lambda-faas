@@ -1,0 +1,6 @@
+[submodule "submodules/runtime"]
+	path = submodules/runtime
+	url = https://github.com/magenticmarketactualskill/rust-lambda-faas-runtime.git
+[submodule "submodules/runtime_api_gem"]
+	path = submodules/runtime_api_gem
+	url = https://github.com/magenticmarketactualskill/runtime_api_gem.git

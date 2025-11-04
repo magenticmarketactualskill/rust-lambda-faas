@@ -44,7 +44,7 @@ mkdir -p %{buildroot}/var/task
 mkdir -p %{buildroot}%{_sysconfdir}/faas-runtime
 
 # Install the binary
-install -m 0755 runtime/target/release/faas-runtime %{buildroot}/opt/faas-runtime/bin/runtime
+install -m 0755 submodules/runtime/target/release/faas-runtime %{buildroot}/opt/faas-runtime/bin/runtime
 
 # Install bootstrap script
 cat > %{buildroot}/var/runtime/bootstrap << 'EOF'

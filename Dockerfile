@@ -18,8 +18,8 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 WORKDIR /build
 
 # Copy runtime source
-COPY runtime/Cargo.toml runtime/Cargo.lock* ./
-COPY runtime/src ./src
+COPY submodules/runtime/Cargo.toml submodules/runtime/Cargo.lock* ./
+COPY submodules/runtime/src ./src
 
 # Build the runtime with optimizations
 RUN cargo build --release

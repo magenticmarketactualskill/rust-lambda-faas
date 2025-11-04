@@ -14,10 +14,15 @@ This project provides a custom AWS Lambda-compatible FaaS (Function as a Service
 
 ## Architecture
 
+The project is organized into submodules for better modularity:
+
+- **`submodules/runtime/`**: A custom runtime written in Rust that implements the AWS Lambda Runtime API. It is responsible for fetching invocation events, executing user functions, and posting responses.
+- **`submodules/runtime_api_gem/`**: A Ruby gem that implements the AWS Lambda Runtime API server interface for function management and monitoring.
+
 The FaaS container consists of two main components:
 
-1.  **FaaS Runtime:** A custom runtime written in Rust that implements the AWS Lambda Runtime API. It is responsible for fetching invocation events, executing user functions, and posting responses.
-2.  **User Function:** A Rust function compiled as a shared library (`.so` file) that is dynamically loaded by the runtime at startup. This function contains the user's business logic.
+1.  **FaaS Runtime:** The Rust runtime that executes user functions.
+2.  **User Function:** A Rust function compiled as a shared library (`.so` file) that is dynamically loaded by the runtime at startup.
 
 ### Container Base Images
 
@@ -34,6 +39,21 @@ Two Dockerfiles are provided to demonstrate the flexibility of the architecture:
 - Rust 1.82.0 or later
 - `build-essential` (or equivalent) for your platform
 
+### Cloning with Submodules
+
+This project uses git submodules. Clone with:
+
+```bash
+git clone --recursive https://github.com/your-repo/rust-lambda-faas.git
+```
+
+Or if already cloned:
+
+```bash
+git submodule init
+git submodule update
+```
+
 ### Building the Containers
 
 A build script is provided to demonstrate the container size comparison:
@@ -43,6 +63,23 @@ A build script is provided to demonstrate the container size comparison:
 ```
 
 This script will build both the UBI-based and Alpine-based containers and display their sizes.
+
+### Building Individual Components
+
+You can also build the submodules individually:
+
+**Rust Runtime:**
+```bash
+cd submodules/runtime
+cargo build --release
+```
+
+**Runtime API Gem:**
+```bash
+cd submodules/runtime_api_gem
+bundle install
+bundle exec bin/runtime_api_server
+```
 
 ### Running the Container
 
